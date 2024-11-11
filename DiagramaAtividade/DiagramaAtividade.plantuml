@@ -8,38 +8,24 @@ enum TypeEmission {
     Soil
 }
 
+enum TypeFlow {
+    ElementFlow 
+    Product_Flow 
+    Waste_Flow
+}
+
 /'Fim enum'/
 
 /'Inico das classes'/
 
 /'Esta classe representa os fluxos do trabalho'/
-abstract class Flow {
+class Flow {
     String name
+    TypeFlow type
     String categoria
     double fator_emissao
     double quantidade
     String unidade
-}
-
-/'
-Cada uma destas classes abaixo sao os tipos de flow
-Nota: O Product_Flow e o Waste_Flow são tipos de Elemental_Flow, como descrito
-no enunciado
-'/
-/'Nota o elemenentar flow tanto pode ser um input ou output'/
-class Elemental_Flow extends Flow{
-
-}
-
-/'Ocorre entre processos, ou'/
-class Product_Flow extends Elemental_Flow {
-
-}
-
-/'
-Corresponde as substancias/ objetos que serão "alienados" de alguma forma
-'/
-class Waste_Flow extends Elemental_Flow {
     Perdas perda
 }
 
@@ -97,9 +83,9 @@ class Input  {
 
 /'Classe Outpur representa os outputs do projeto'/
 class Output  {
-
+    Waste_Flow waste_flow  
+    Emissoes emissao
 }
-
 
 /'
 Esta classe representa os processos unitarios
@@ -125,8 +111,15 @@ class ProcessoAgregado {
     Emissao emissaoTotal
 }
 
-/'Representa as várias emissão que podem acontecer, do solo, ar e água'/
+/'
+Representa as várias emissão que podem acontecer, do solo, ar e água
+
+Nota: Não sei até que ponto esta classe é necessária
+com a existencia da classe perda ou vice-versa
+'/
 class Emissao {
+    String name
+    TypeEmission type
     double fator_emissao
     double emissao
     double emissao_ajustado
