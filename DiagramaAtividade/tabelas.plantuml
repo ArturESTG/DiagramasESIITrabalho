@@ -1,0 +1,143 @@
+@startuml
+/'
+Aqui para baixo estão as classes que ainda não sei onde se encaixariam
+'/
+
+/'Possivel representação da tabela 1 - Tabela de resumo para cada fluxo
+de componenetes'/
+
+/'Esta tabela representa tanto o material como os materiais primarios
+No final é apresentado os dados que precisamos ter para calcular o total de
+emissão do produto = fator de emissão * amount
+e ainda meti o total em perdas, para saber o total perdido
+Provavelmente a perda estará no processingFlows
+'/
+class Material {
+    String name
+    Processos material_flow
+    Processos processing_flows
+    Processo asembly_flow
+    String typical_unit
+    double amount
+
+    Perdas perdas_producao
+    double emissoes
+}
+
+/'Neste caso faz extends pois o componenet é o resultado união de 
+vários materiais primarios '/
+class Component extends Material{
+    Material[] primary_materilas
+}
+
+/'Fim dessa possivel representação'/
+
+
+
+/'
+Tabela 2
+fator Emissão --> kgCO2e/kWh
+procura Energia primaria --> Mj/kWh
+Uso da água --> litros/kWh
+'/
+class Power_Source {
+    String name
+    double proporcao 
+    double fator_emissao
+}
+
+class Mix_Eletricty extends Power_Source {
+    double energia_primaria
+    double uso_agua
+}
+
+class Weighted_Average extends Power_Source {
+    double weighted_average
+}
+
+/'
+Esta classe serve para calcular o valor total
+de emissao de kgCo2e/kWh, para quando a empresa
+fornece todos os gasto ou quando não temos acesso
+a eles
+'/
+class Eletricty_Emission {
+    Power_Source[] power_source
+    double tot_emission
+}
+
+/'
+Tabela abaixo da tabela 2
+'/
+class PorugalElectircyMix {
+    String fonte
+    double percentagem
+    double fator_emissao
+    double contribuicao_emissao_media
+}
+
+/'
+Tabela 3
+'/
+class ConsumoEstimadoEletricidade {
+    String etapa
+    processos processos
+    double consumo_eletricidade_estimada
+}
+
+/'
+Tabela abaixo da tabela 3
+Pelo o que percebi este é o rotulo para o desperdicio de cada produto
+'/
+/'
+Esta classe representa as Etapas de fabrico
+'/
+class Etapa {
+    Input_Outputs input
+    Processos processos
+}
+
+class ConsumoEstimadoEletricidade {
+    Etapa etapa
+    double quantidade
+    double fator_emissao
+    double emissoes
+}
+
+
+/'Esta classe é a que guarda os dados dos componentes usados para a 
+produção e do produto final (Tabela 1 - Tabela de Resumo para cada fluxo de componentes)
+'/
+class flow_Componenets {
+    String component
+    String[] primary_material
+    String[] material_flow
+    processos processing_flow
+    String[] assembly_flow
+    String typical_Unit
+    double amount
+}
+/'
+Esta classe não importa para nada é só para ter aqui no plant
+os dados que constituem os dados principais
+
+Fluxos de entrada e saída de cada etapa, incluíndo tipos de material e
+quantidade por produto, incluindo guarnições. Os fluxos podem ser do tipo:
+i. Recursos naturais (entrada) ou material (entrada/saída)
+ii. Energia (entrada)
+iii. Fatores de emissão para processos (emissões para o ar, solo, àgua)
+
+'/
+class DadosPrimarios {
+    Input_Outputs Inputs
+    String pais_origem
+    double quantidade_Reciclado
+    String Tipo_Material_Embalagem
+    double quantidade_Material_Embalagem
+    String Tipo_Acessorios
+    double Quantidade_Fabrico
+    double taxa_Perda_Em_Cada_Etapa
+    double Peso_Produto
+    String Pais_Fabrico
+}
+@enduml

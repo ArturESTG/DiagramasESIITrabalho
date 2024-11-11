@@ -1,0 +1,99 @@
+@startuml
+/'Inicio das Enums'/
+
+/'
+Os ultimos 3 flows são os flows apresentados na tabela 1
+'/
+enum typeFlow {
+    Elemental_Flow 
+    Product_Flow
+    Waste_Flow
+}
+
+enum typeInput {
+    Input
+    Output
+}
+
+
+/'Fim das Enums'/
+
+/'Inico das classes'/
+
+class Flow {
+    String name
+    String categoria
+    typeFlow type
+    double fator_emissao
+    String unidade
+}
+
+class Perdas {
+    double amount_necessary
+    String unidade
+    double valor_ajustado_waste
+    double emissoes
+    double emissoes_ajustada
+}
+
+/' Aqui guarda os Fluxos de entrada e de saida
+Os de entrada corresponde a tudo o que entra para produzir
+o produto
+Os fluxos de saida a tudo o gerado pela produção
+
+O fator_emissão não até que ponto pode estar cá
+'/
+class Input_Outputs {
+    String name
+    typeInput type 
+    Flow flow
+    double quantidade 
+    String unidade
+    double fator_emissao
+}
+
+/'Esta classe seria um processo unitário
+
+Segundo a figura 2 - Processo, Fluxos e Sistema
+cada processo tem um input e um output
+'/
+class Processo {
+    String nomePro
+    Input_Outputs input
+    Input_Outputs output
+}
+
+/'
+Este classe representa um processo agregado
+
+Ver se o name_processos é necessário
+'/
+class Processos {
+    String name_processos
+    Processo processo
+    String categoria
+    String descricao
+    String localizacao
+    String unidade
+}
+
+class Etapa_Producao {
+    String name_etapa
+    Processo processo_prod
+    double consumo_eletricidade
+    Perdas perda
+}
+
+
+/'Não sei onde poderá ser utilizado'/
+class Material {
+    String name
+    Processos material_flow
+    Processos processing_flows
+    Processo asembly_flow
+    String typical_unit
+    double amount
+}
+
+/' das classes'/
+@enduml
