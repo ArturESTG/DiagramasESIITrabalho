@@ -1,4 +1,12 @@
 @startuml
+/'Inicio das enums'/
+enum typeEmission {
+    Water
+    Soil
+    Air
+}
+/'Fim das enums'/
+
 
 /'Inico das classes'/
 
@@ -6,6 +14,7 @@ abstract class Flow {
     String name
     String categoria
     double fator_emissao
+    double quantidade
     String unidade
 }
 
@@ -42,7 +51,7 @@ o produto
 Os fluxos de saida a tudo o gerado pela produção
 
 O fator_emissão não até que ponto pode estar cá
-'/
+
 class Input_Outputs {
     String name
     typeInput type 
@@ -51,19 +60,34 @@ class Input_Outputs {
     String unidade
     double fator_emissao
 }
+'/
+class Input_Outputs {
+    String name
+    Input material_primary
+    Flow flow
+    Processos assembly_flow 
+    double amount 
+    String unidade
+}
 
-class Input extends Input_Outputs {
+/'Representas os mateirais a utilizar e outros elementos, tipo energia,
+agua, etc
+
+O elementarl Flow, é porque o input tanto pode ser uma energia ou 
+recurso naturais
+O type é para saber se é energia ou materia-prima
+A classe perdas é para saver as perdas relacionadas com o input
+'/
+class Input  {
+    Elemental_Flow elemenentar_flow
+    String type
+    Emissoes emissao
+}
+
+class Output  {
 
 }
 
-class Output extends Input_Outputs {
-
-}
-
-/'Esta probavelmente e desnecessária'/
-class Emissoes extends Input_Outputs {
-
-}
 
 /'Esta classe seria um processo unitário
 
@@ -74,20 +98,23 @@ class Processo {
     String nomePro
     Input input
     Output output
+    Emissao emissao
 }
 
 /'
 Este classe representa um processo agregado
 
 Ver se o name_processos é necessário
+A classe emissão aqui é para guardar a poluição total do processo
 '/
 class Processos {
-    String name_processos
-    Processo processo
+    String name_processo
+    Processo[] processos
     String categoria
     String descricao
     String localizacao
     String unidade
+    Emissao emissao
 }
 
 class Etapa_Producao {
@@ -99,22 +126,6 @@ class Etapa_Producao {
 /'Classes a repensar'/
 
 /'
-Provavelemente só é preciso 1 class 
-'/
-class Material {
-    String name
-    Processos material_flow
-    Processos processing_flows
-    Processo asembly_flow
-    String typical_unit
-    double amount
-}
-
-class Component extends Material {
-    Material[] primary_materials 
-} 
-
-/'
 Tabela para o calculo de CO2e 
 '/
 /'
@@ -123,10 +134,16 @@ proporcao --> %
 fator emissao --> kgCO₂e/kWh
 '/
 
-abstract class Power_Source {
+/'Esta probavelmente e desnecessária'/
+abstract class Emissao {
+    double fator_emissao
+    double emissao
+    double emissao_ajustado
+}
+
+abstract class Power_Source extends Emissao{
     String name
     double proporcao 
-    double fator_emissao
 }
 
 /'Energia Primaria --> MJ/kWh
