@@ -1,12 +1,4 @@
-@startuml
-/'Inicio das enums'/
-enum typeEmission {
-    Water
-    Soil
-    Air
-}
-/'Fim das enums'/
-
+@startuml DiaramaAtividade
 
 /'Inico das classes'/
 
@@ -65,7 +57,7 @@ class Input_Outputs {
     String name
     Input material_primary
     Flow flow
-    Processos assembly_flow 
+    ProcessoAgregado assembly_flow 
     double amount 
     String unidade
 }
@@ -94,7 +86,7 @@ class Output  {
 Segundo a figura 2 - Processo, Fluxos e Sistema
 cada processo tem um input e um output
 '/
-class Processo {
+class ProcessoUnitario {
     String nomePro
     Input input
     Output output
@@ -107,9 +99,9 @@ Este classe representa um processo agregado
 Ver se o name_processos é necessário
 A classe emissão aqui é para guardar a poluição total do processo
 '/
-class Processos {
+class ProcessoAgregado {
     String name_processo
-    Processo[] processos
+    ProcessoUnitario[] processos
     String categoria
     String descricao
     String localizacao
@@ -117,9 +109,10 @@ class Processos {
     Emissao emissao
 }
 
+/'Represnta cada etapa de produção'/
 class Etapa_Producao {
-    Processo etapa
-    Processos processo_prod
+    ProcessoUnitario etapa
+    ProcessoAgregado processo_prod
     double consumo_eletricidade
 }
 
@@ -156,6 +149,10 @@ class Mix_Eletricty extends Power_Source {
 class Weighted_Average extends Power_Source {
     double weighted_average
 }
+
+class Emissao_Agua extends Emissao{}
+
+class Emissao_Ar extends Emissao {}
 
 /'
 Esta classe serve para calcular o valor total
