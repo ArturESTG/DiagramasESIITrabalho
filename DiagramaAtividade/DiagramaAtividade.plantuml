@@ -1,7 +1,18 @@
 @startuml DiaramaAtividade
 
+/'Inicio enum'/
+
+enum TypeEmission {
+    Water 
+    Air
+    Soil
+}
+
+/'Fim enum'/
+
 /'Inico das classes'/
 
+/'Esta classe representa os fluxos do trabalho'/
 abstract class Flow {
     String name
     String categoria
@@ -10,8 +21,12 @@ abstract class Flow {
     String unidade
 }
 
-/'Nota o elemenentar flow tanto pode ser um input
-ou output'/
+/'
+Cada uma destas classes abaixo sao os tipos de flow
+Nota: O Product_Flow e o Waste_Flow são tipos de Elemental_Flow, como descrito
+no enunciado
+'/
+/'Nota o elemenentar flow tanto pode ser um input ou output'/
 class Elemental_Flow extends Flow{
 
 }
@@ -22,8 +37,7 @@ class Product_Flow extends Elemental_Flow {
 }
 
 /'
-Corresponde as substancias/ objetos que serao
-"alienados" de alguma forma
+Corresponde as substancias/ objetos que serão "alienados" de alguma forma
 '/
 class Waste_Flow extends Elemental_Flow {
     Perdas perda
@@ -53,6 +67,11 @@ class Input_Outputs {
     double fator_emissao
 }
 '/
+
+/'Classe Input_Output está classe guarda os materiais que são considerados inputs e 
+outputs ao mesmo tempo
+Nota: Ignorar o comentario acima, era a classe Input_Output antiga
+'/
 class Input_Outputs {
     String name
     Input material_primary
@@ -76,28 +95,25 @@ class Input  {
     Emissoes emissao
 }
 
+/'Classe Outpur representa os outputs do projeto'/
 class Output  {
 
 }
 
 
-/'Esta classe seria um processo unitário
-
-Segundo a figura 2 - Processo, Fluxos e Sistema
-cada processo tem um input e um output
+/'
+Esta classe representa os processos unitarios
 '/
 class ProcessoUnitario {
     String nomePro
     Input input
     Output output
+    Flow flow
     Emissao emissao
 }
 
 /'
-Este classe representa um processo agregado
-
-Ver se o name_processos é necessário
-A classe emissão aqui é para guardar a poluição total do processo
+Este classe representaos processos agupados
 '/
 class ProcessoAgregado {
     String name_processo
@@ -106,37 +122,30 @@ class ProcessoAgregado {
     String descricao
     String localizacao
     String unidade
-    Emissao emissao
+    Emissao emissaoTotal
 }
 
-/'Represnta cada etapa de produção'/
-class Etapa_Producao {
-    ProcessoUnitario etapa
-    ProcessoAgregado processo_prod
-    double consumo_eletricidade
-}
-
-/'Classes a repensar'/
-
-/'
-Tabela para o calculo de CO2e 
-'/
-/'
-Não sei se por ser abstrata irá dar problemas 
-proporcao --> %
-fator emissao --> kgCO₂e/kWh
-'/
-
-/'Esta probavelmente e desnecessária'/
-abstract class Emissao {
+/'Representa as várias emissão que podem acontecer, do solo, ar e água'/
+class Emissao {
     double fator_emissao
     double emissao
     double emissao_ajustado
 }
 
-abstract class Power_Source extends Emissao{
+/'
+Classe para guardar o consumo de energia em cada processo, provavelmetne apenas os 
+processos de produção
+'/
+class Consumo_Energia {
+    Power_Source[] power_source
+    double tot_emission
+}
+
+/'Daqui para baixo está a representação da tabela de energia do enunciado'/
+abstract class Power_Source{
     String name
-    double proporcao 
+    double proporcao
+    double fator_emissao 
 }
 
 /'Energia Primaria --> MJ/kWh
@@ -150,20 +159,14 @@ class Weighted_Average extends Power_Source {
     double weighted_average
 }
 
-class Emissao_Agua extends Emissao{}
+/'Classes a repensar'/
 
-class Emissao_Ar extends Emissao {}
-
-/'
-Esta classe serve para calcular o valor total
-de emissao de kgCo2e/kWh, para quando a empresa
-fornece todos os gasto ou quando não temos acesso
-a eles
-'/
-class Eletricty_Emission {
-    Power_Source[] power_source
-    double tot_emission
+/'Represnta cada etapa de produção'/
+class Etapa_Producao {
+    ProcessoUnitario etapa
+    ProcessoAgregado processo_prod
+    double consumo_eletricidade
 }
 
-/' das classes'/
+/'Fim das classes a repensar'/
 @enduml
