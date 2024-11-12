@@ -1,0 +1,61 @@
+@startuml aquitetura
+/'Necessito encaixar os flows em algum ladao'/
+
+interface "data" as data
+interface "primary data" as prim_data
+interface "secunday data" as sec_data
+
+interface "input" as input
+interface "output" as output
+
+interface "consumo enegia" as consumo_ener
+interface "perdas" as perdas
+interface "emissao media ponderada" as emiss_med_ponde
+interface "PCF total" as pcf_tot
+
+/'
+O data Ingestion e o que lê os ficheiros CSV
+
+Ver se o retorno do Data Ingestion está correto, ou
+outro nome.
+'/
+[Company] as comp
+comp - prim_data
+
+[Missing primary data] as miss_prim
+miss_prim - sec_data
+
+[Data Ingestion] as data_ingestion
+data_ingestion - data
+
+data_ingestion --( prim_data
+data_ingestion --( sec_data
+
+[Data Processing] as data_processing
+data_processing --( data
+data_processing - input
+
+[Processo] as processo
+processo - output
+processo --( input
+
+[Calculator] as calculator
+calculator - perdas
+calculator - consumo_ener
+calculator - emiss_med_ponde
+calculator - pcf_tot
+
+calculator -( output
+
+
+
+[PCF] as PCF
+PCF - PCF_Data
+PCF --( perdas
+PCF --( consumo_ener
+PCF --( emiss_med_ponde
+PCF --( pcf_tot
+
+
+
+@enduml

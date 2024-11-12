@@ -23,10 +23,10 @@ class Flow {
     String name
     TypeFlow type
     String categoria
-    double fator_emissao
     double quantidade
     String unidade
     Perdas perda
+    Emissap emissao
 }
 
 class Perdas {
