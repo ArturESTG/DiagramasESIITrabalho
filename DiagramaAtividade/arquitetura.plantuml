@@ -16,12 +16,15 @@ interface "produtos" as produto
 interface "emissões" as emissoes
 
 interface "consumo enegia" as consumo_ener
-interface "perdas" as perdas
+interface "perda total" as perda_tot
 interface "emissao media ponderada" as emiss_med_ponde
 interface "PCF total" as pcf_tot
 
 interface "material" as material
 interface "energia" as energia
+
+interface "perdas" as perdas
+
 /'
 O data Ingestion e o que lê os ficheiros CSV
 
@@ -50,10 +53,13 @@ input_comp --( energia
 input_comp --( material
 input_comp - input
 
-[Processo] as processo
-processo - produto 
-processo - emissoes
-processo --( input
+[Processo Unitario] as processo_unitario
+processo_unitario - produto 
+processo_unitario - emissoes
+processo_unitario --( input
+
+[Processo Agrado] as processo_agregado 
+
 
 [Output] as output_comp
 output_comp -- output
@@ -65,7 +71,7 @@ output_comp --( emissoes
 calculator --( output
 calculator --( input
 
-calculator - perdas
+calculator - perdaTot
 calculator - consumo_ener
 calculator - emiss_med_ponde
 calculator - pcf_tot
@@ -73,17 +79,27 @@ calculator - pcf_tot
 
 [PCF] as PCF
 PCF - PCF_Data
-PCF --( perdas
+PCF --( perda_tot
 PCF --( consumo_ener
 PCF --( emiss_med_ponde
 PCF --( pcf_tot
 
+/'
+Tipos de relatorios
+'/
+interface "relatorio emissoes" as rel_emissoes /'Este mostra todos as etapas de produção que poluiram'/
+interface "relatorio perdas" as rel_perdas /'Mostra todas as perdas obtidas na produção do produto'/
 [Relatorios] as relatorio
 relatorio --( PCF_Data
-
+relatorio - rel_emissoes
+relatorio -- rel_perdas
+/'
+O output neste caso representa um processo unitario
+'/
 [Etapa Produção] as etapa
-
-
+etapa -( output
+etapa - perdas
+etapa - emissoes
 /'
 Componentes que tenho duvidas ou tenho a certeza que devem existir mas ainda não encontrei onde colocar
 '/
