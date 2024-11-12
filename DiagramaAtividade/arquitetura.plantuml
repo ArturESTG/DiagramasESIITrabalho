@@ -2,25 +2,34 @@
 /'Necessito encaixar os flows em algum ladao'/
 
 interface "data" as data
+/'Estes primary data tanto são dados de componenetes
+como dados de energia ou água'/
 interface "primary data" as prim_data
 interface "secunday data" as sec_data
 
+/'Se calhar trocar input por fluxo, porque é um fluxo de 
+entrada e não input'/
 interface "input" as input
 interface "output" as output
+
+interface "produtos" as produto
+interface "emissões" as emissoes
 
 interface "consumo enegia" as consumo_ener
 interface "perdas" as perdas
 interface "emissao media ponderada" as emiss_med_ponde
 interface "PCF total" as pcf_tot
 
+interface "material" as material
+interface "energia" as energia
 /'
 O data Ingestion e o que lê os ficheiros CSV
 
 Ver se o retorno do Data Ingestion está correto, ou
 outro nome.
 '/
-[Company] as comp
-comp - prim_data
+[Company] as company
+company - prim_data
 
 [Missing primary data] as miss_prim
 miss_prim - sec_data
@@ -32,21 +41,34 @@ data_ingestion --( prim_data
 data_ingestion --( sec_data
 
 [Data Processing] as data_processing
+data_processing - material
+data_processing - energia
 data_processing --( data
-data_processing - input
+
+[Input] as input_comp
+input_comp --( energia
+input_comp --( material
+input_comp - input
 
 [Processo] as processo
-processo - output
+processo - produto 
+processo - emissoes
 processo --( input
 
+[Output] as output_comp
+output_comp -- output
+output_comp --( produto
+output_comp --( emissoes
+ 
+
 [Calculator] as calculator
+calculator --( output
+calculator --( input
+
 calculator - perdas
 calculator - consumo_ener
 calculator - emiss_med_ponde
 calculator - pcf_tot
-
-calculator -( output
-
 
 
 [PCF] as PCF
@@ -56,6 +78,22 @@ PCF --( consumo_ener
 PCF --( emiss_med_ponde
 PCF --( pcf_tot
 
+[Relatorios] as relatorio
+relatorio --( PCF_Data
+
+[Etapa Produção] as etapa
+
+
+/'
+Componentes que tenho duvidas ou tenho a certeza que devem existir mas ainda não encontrei onde colocar
+'/
+
+[Flows] as flows
+flows - flow
+
+/'Ligações que não sei se são necessárias ou se deviam existir sequer'/
+
+ 
 
 
 @enduml
