@@ -6,8 +6,8 @@ interface "process data" as process_data
 interface "gestão input" as gest_input
 interface "gestão output" as gest_output
 interface "gestão processos" as gest_process
+interface "gestão etapas" as gest_etapas
 interface "PCF total" as pcf_tot
-interface "PCF Data" as PCF_Data
 interface "relatorios" as relatorios 
 
 [Data] as data_comp
@@ -33,18 +33,13 @@ processo -- gest_process
 processo --( gest_input
 processo --( gest_output
 
+[Etapa produção] as etapa
+gest_etapas -- etapa
+etapa -( gest_process
+
 [Calculator] as calculator
-calculator --( gest_process
-calculator --( gest_input
-calculator --( gest_output
-calculator - pcf_tot
-
-[PCF] as PCF
-PCF - PCF_Data
-PCF --( pcf_tot
-
-[Relatorios] as relatorio_comp
-relatorio_comp --( PCF_Data
-relatorio_comp - relatorios
+calculator --( gest_etapas
+calculator -- pcf_tot
+calculator -- relatorios
 
 @enduml

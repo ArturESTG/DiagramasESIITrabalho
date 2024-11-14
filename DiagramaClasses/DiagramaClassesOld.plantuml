@@ -1,0 +1,261 @@
+@startuml DiagramaClases
+
+/'NOTAS IMPORTANTES
+Processo - o processo não devia estar ligado ao conjunto de inputs e ao conjunto de output
+pelo motivo que um processo pode ter varios ou um input/output
+
+'/
+
+/'
+Inicio packages
+'/
+package "Data" {
+    interface Selecet_Data {
+
+    }
+
+}
+
+package "Data Ingestion" {
+    interface Import_Data {
+        + void import()
+    }
+}
+
+package "Data Processing" {
+    interface Data_Processing {
+        + void process_data()
+    }
+}
+
+package "Inputs" {
+    interface Gestao_Input {
+        + void addEInput(Input input)
+        + Input removerEtapa(Input target)
+        + void alterarEtapa(Input target, Input etapa)
+        + void consultarInput(Input target)
+        + void listar()
+        + String toString() 
+    }
+
+    class Gestao_Inputs implements Gestao_Input {
+        int count 
+    }
+
+    abstract class Input {
+        int id_input
+    }
+
+    class Material extends Input {
+        int id_material
+    }
+
+    abstract class Fonte_Energia extends Input {
+        int id_fonte
+        String fonte_energ
+        float proporcao
+        double fator_emissao
+    }
+
+    class Mix_Energia extends Fonte_Energia {
+        double procura_ener_prim
+        double uso_agua
+    }
+
+    class Energia_Hipotetica extends Fonte_Energia {
+        double cont_energ_ponderada
+    }
+
+    /'
+    Este classe junta um input e um ouptut numa classe
+    apenas, porque existe coisas que são um input/output ao mesmo tempo
+    '/
+    class Input_Output {
+        int id_input
+        int id_ouput
+    }
+
+    Input "0..*" -- "1..1" Gestao_Inputs
+}
+
+package "Outputs" {
+    interface Gestao_Output {
+        + void addOutput(Output output)
+        + Output removerOutput(Output target)
+        + void alterarOutput(Output target, Output output)
+        + void consultarOutput(Output target)
+        + void listar()
+        + String toString() 
+    }
+
+    class Gestao_Outputs implements Gestao_Output {
+        int count
+    }
+
+    abstract class Output {
+        int id_output
+    }
+
+    class Emissoes extends Output {
+
+    }
+
+    class Produto extends Output {
+    
+    }
+
+    /'Output Ligacoes'/
+    Output "0..*" -- "1..1" Gestao_Outputs
+}
+
+package "Processo" {
+    interface Gestao_Processos {
+        + void addProcesso(Processo processo)
+        + Processo removerProcesso(Processo target)
+        + void alterarProcesso(Processo target, Processo etapa)
+        + void consultarProcesso(Processo target)
+        + void listar()
+        + String toString() 
+    }
+
+    /'
+    Fazer ligação 0..* com o Processo_unitario 
+    '/
+    abstract class Processo {
+        String name
+        String descricao
+        String localizacao
+    }
+
+    class Processo_Agregado extends Processo implements Gestao_Processos {
+        int count_process
+
+    }
+
+    class Processo_unitario extends Processo {
+        int id_processo_un
+    }
+
+    /'
+    Aqui mete-se uma variavel
+    para saber o valor necessario
+    do input ou essa variavel vai 
+    estar no processo?
+    '/
+
+    /'
+    As perdas nao seria uma interface
+    do processo?????
+    '/
+    class Perdas {
+        int id_perda
+        double valor_ajustado
+        double emissao_ajustada
+        --
+        + void calculate_valor_ajustado()
+        + void calculate_emissao_ajustada()
+    }
+
+    enum TypeFlow {
+        Emissions
+        Land_Use
+        Materials_Production
+        Resources
+        Wastes
+    }
+
+    class Flow {
+        int id
+        TypeFlow type
+    }
+
+
+
+    Processo_unitario "1..1" - "0..*" Perdas
+    Processo_unitario "0..1" - "1..*" Input
+    Processo_unitario "0..1" - "1..*" Output
+}
+
+package "Etapa Produção" {
+
+    interface Gestao_Etapas {
+        + void addEtapa(Etapa etapa)
+        + Etapa removerEtapa(Etapa target)
+        + void alterarEtapa(Etapa target, Etapa etapa)
+        + void consultarEtapa(Etapa target)
+        + void listar()
+        + String toString()
+    }
+
+    class Producao implements Gestao_Etapas{
+        int count
+    }
+
+    class Etapa_Producao {
+        int id_etapa
+        double consumo_eletre_estim    
+    }
+
+    /'Etapa Produção Ligacoes'/
+    Etapa_Producao "1..1" -- "0..*" Producao
+}
+
+package "Calculator" {
+    /'
+    Ver quais vão ser os argumentos de cada
+    calculo
+
+    Ver qual será melhor double ou float
+    '/
+    interface PCF_Tot {
+       + double tot_emissoes_CO2e() 
+       + double emissoes_med_ponderada()
+       + double tot_perdas()
+       + double PCF_total()
+       + double PCF_tot_ajustado()
+    }
+
+    interface Relatorios {
+        + void relatorio_emissoes()
+        + void relatorio_perdas()
+        + void relatorio_componentes()
+    }
+
+    /'
+    Aqui vai ser guardado todos os 
+    resultados das contas para obter o PCF
+    e os seus dados
+    '/
+    class PCF implements PCF_Tot, Relatorios {
+
+    }
+}
+
+/'
+Fim dos packages
+'/
+
+/'
+Inicio das ligações
+'/
+
+
+/'Input Ligacoes'/
+
+Processo_unitario "1..*" -- "1..1" Processo_Agregado
+Etapa_Producao "1..*" -- "1..1" Processo_Agregado
+
+/'Ligações Processos'/
+/'Ligaçoes PCF'/
+PCF "1..1" -- "0..*" Output
+PCF "1..1" -- "0..*" Input
+PCF "1..1" -- "0..*" Producao
+
+/'Ligação Input com Output'/
+Input "1..*" - "0..*" Output
+(Input, Output) .. Input_Output
+
+/'
+Fim das ligações
+'/
+@enduml
