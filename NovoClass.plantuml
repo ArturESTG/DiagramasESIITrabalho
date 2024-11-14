@@ -51,6 +51,7 @@ package "Enums"{
     Enum FlowType{
         Input
         Output
+        Input_output
     }
 }
 
@@ -93,15 +94,15 @@ package "Interfaces"{
         + String toString() 
     }
     
-    /'
-    interface Gestao_Etapas {
+    
+    interface Gestao_Etapa {
         + void addEtapa(Etapa etapa)
         + void removerEtapa(Etapa etapa)
-        + void alterarEtapa(Etapa target, Etapa etapa)
+        + void alterarProcesso(Etapa target, Etapa etapa)
         + void listar()
         + String toString()
     }
-    '/
+    
 
      /'
     Ver quais vão ser os argumentos de cada
@@ -154,16 +155,6 @@ package "Produto"{
         class perdas {
         'perdas possuem um material, onde esta guardado o valor das perdas (perdas é output)
         }
-
-        /'
-        class Componente extends produto {
-            
-            os componentes são equivalentes aos tais produtos compostos,
-            como fazer para evitar a repetição de código e poder constinuar com esta estrutura?
-            
-
-        }
-        '/
 
     }
 
@@ -230,20 +221,23 @@ package "Produto"{
 
 package "Processo" {
 
-
-    /'
-    Fazer ligação 0..* com o Processo_unitario 
-    '/
-    class Processo_Agregado {
-
-    }
-
-    class Processo_unitario {
+    abstract class Processo {
         -String nome
         -String descricao
         -ProcessType tipo
         'para saber o numero total de processos
         -Static int Cnt
+    }
+
+    /'
+    Fazer ligação 0..* com o Processo_unitario 
+    '/
+    class Processo_Agregado extends Processo {
+
+    }
+
+    class Processo_unitario extends Processo {
+ 
     }
 
 
@@ -287,7 +281,6 @@ Inicio das ligações
 treatingdata ..|> treatingDataInt
 GestorInput ..|> Gestao_Input
 GestorOutput ..|> Gestao_Output
-Processo_Agregado ..|> Gestao_Processos
 'Producao ..|> Gestao_Etapas
 Relatorio ..|> relatorios
 PCF ..|> PCF_calculos
@@ -300,6 +293,8 @@ produto "0..*" -- "1..1" GestorInput
 
 produto "1..*" -- "1..1" Processo_unitario
 Relatorio "1..1" -- "1..1" PCF
+Processo_Agregado "1..1" -- "0..*" Gestao_Etapa
+Processo_unitario "1..1" -- "0..*" Gestao_Processos
 
 
 

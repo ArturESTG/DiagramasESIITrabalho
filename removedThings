@@ -1,0 +1,102 @@
+package "Input" {
+
+    
+    /'
+    1º Mudar o nome
+    2º Fazer uma ligação de 0 para muitos com o Input
+    '/
+    class GestorInput{
+        - int Cnt
+    }
+
+    abstract class input {
+
+    }
+
+    abstract class Material extends input {
+        - String name
+        - String unidade
+        - double quantidade
+    }
+
+    class MaterialPrimario extends Material {
+        
+    }
+    
+    /'
+    para materiais compostos(preFabricados), que ja possuem um valor de emissões
+    associado a sua produção, que tambem deverá se somar ao PCF
+    '/
+    class MaterialComposto extends Material {
+    }
+
+    abstract class FonteEnergia extends input {
+        - String fonte
+        - float proporcao
+        - double fatorEmissao
+    }
+
+    class Mix_Energia extends FonteEnergia {
+        - double procura_ener_prim
+        - double uso_agua
+    }
+
+    class Energia_Hipotetica extends FonteEnergia {
+        'Contribuição das emissões de CO2e deste tipo de energia (contribuicaoEmissoes = fatorEmissao * proporcao)
+        '- double contribuicaoEmissoes , nao e necessario, pois, de acordo com a ideologia ca seguida, as emissoes guardam somente o valor das emissoes, logo esta classe vai possuir uma emissao
+        /'
+        fator emissão em fonte de energia, nao faz sentido quando sao criadas apartir da energia hipotetica
+        pois o fatorEmissao das energias hipoteticas sao calculados apartir da soma do produto da proporcao e do fatorEmissao de cada fonte de energia
+        '/
+    }
+
+    package "Etapa Produção" {
+    
+
+    /'
+    Esta tabela representa a tabela de
+    Etapas de produção
+    '/
+    class Producao{
+
+    }
+
+    /'
+    Ligar com processos
+    Os campos:
+    A etpa e um processo_unitario (1..*)
+    E o processo é um processo_agregado(1 ..*)
+    '/
+    class Etapa_Producao {
+        double consumo_eletre_estim    
+    }
+    
+}
+}
+
+package "Output" {
+
+    class GestorOutput {
+        -int Cnt
+    }
+
+    abstract class Output {
+        
+    }
+
+    class Emissoes extends Output {
+        -double valor_emissao
+        -String unidade
+    }
+
+    class Componente extends Output {
+        /'
+        os componentes são equivalentes aos tais produtos compostos,
+        como fazer para evitar a repetição de código e poder constinuar com esta estrutura?
+        '/
+
+    }
+
+    /'Output Ligacoes'/
+    Output "0..*" -- "1..1" GestorOutput
+}
