@@ -1,0 +1,243 @@
+@startuml DiagramaClases
+
+/'
+Notas para quem for pegar nisto
+
+1º Quando quero meter uma class como 
+elemento de outra classe a forma correta 
+de o fazer é criando uma ligação entre ambas, 
+ex: 1..1/ 0..1 / 1..0
+
+2º Leiam os meus comentarios, porque ou 
+são duvidas ou e o meu racicionio para 
+fazer alguma coisa
+
+3º As ligações devem estar feitas no final
+do documento, depois dos packages, se 
+for uma ligação entre classes de diferentes
+packages
+
+ASS: Artur
+'/
+
+/'
+Avisos/Notas Importantes
+
+O MATERIAL PODE SER UM INPUT/OUTPUT AO MESMO TEMPO POIS UM MATERIAL/PRODUTO PODE
+SER RETORNADA DEPOIS DE UM PROCESSO E UM PROCESSO PODE PRECISAR DE UM MATEIRAL
+PARA FAZER UM PRODUTO
+
+Todas as Classes que sao Conjunto_qualquerCoisa o nome é para alterar eu só 
+meti conjunto para não estar a pensar muito num nome, mas temos de mudar o
+nome para algo mais bonito.
+'/
+
+/'
+Inicio packages
+'/
+package "Data" {
+
+    interface treatingData{
+        'part of data ingestion
+        +importData
+        'part of data processing
+        +processData
+        'used to select/change the source of the data used in the api
+        +selectData
+    }
+
+
+}
+
+package "Input" {
+    interface Gestao_Input {
+        + void addInput(Input input)
+        + void removerEtapa(Input input)
+        + void alterarEtapa(Input target, Input etapa)
+        'pesquisa atraves das etapas com parametros (decidir quais os parametros)
+        + void pesquisarEtapa()
+        + void listar()
+        + String toString() 
+    }
+    
+    /'
+    1º Mudar o nome
+    2º Fazer uma ligação de 0 para muitos com o Input
+    '/
+    class Conjunto_Input implements Gestao_Input{
+
+    }
+
+    abstract class Input {
+
+    }
+
+    class Material extends Input {
+        - String name
+        - String unidade
+        - double quantidade
+    }
+
+    abstract class FonteEnergia extends Input {
+        - String fonte_energ
+        - float proporcao
+        - double fator_emissao
+    }
+
+
+
+    class Mix_Energia extends Fonte_Energia {
+        double procura_ener_prim
+        double uso_agua
+    }
+
+    class Energia_Hipotetica extends Fonte_Energia {
+        double cont_energ_ponderada
+    }
+
+    Input "0..*" -- "1..1" Conjunto_Input
+}
+
+package "Output" {
+    interface Gestao_Output {
+        + void addEtapa(Output output)
+        + void removerEtapa(Output output)
+        + void alterarEtapa(Output target, Output output)
+        + void listar()
+        + String toString() 
+    }
+
+    class Conjunto_Output implements Gestao_Output {
+
+    }
+
+    abstract class Output {
+        
+    }
+
+    class Emissoes extends Output {
+
+    }
+
+    class Componente extends Output {
+
+    }
+
+    /'Output Ligacoes'/
+    Output "0..*" -- "1..1" Conjunto_Output
+}
+
+package "Processo" {
+    interface Gestao_Processos {
+        + void addEtapa(Processo etapa)
+        + void removerEtapa(Processo etapa)
+        + void alterarEtapa(Processo target, Processo etapa)
+        + void listar()
+        + String toString() 
+    }
+
+    /'
+    Fazer ligação 0..* com o Processo_unitario 
+    '/
+    class Processo_Agregado implements Gestao_Processos {
+
+    }
+
+    class Processo_unitario {
+
+    }
+
+
+}
+
+package "Etapa Produção" {
+
+    interface Gestao_Etapas {
+        + void addEtapa(Etapa etapa)
+        + void removerEtapa(Etapa etapa)
+        + void alterarEtapa(Etapa target, Etapa etapa)
+        + void listar()
+        + String toString()
+    }
+
+    /'
+    Esta tabela representa a tabela de
+    Etapas de produção
+    '/
+    class Producao implements Gestao_Etapas{
+
+    }
+
+    /'
+    Ligar com processos
+    Os campos:
+    A etpa e um processo_unitario (1..*)
+    E o processo é um processo_agregado(1 ..*)
+    '/
+    class Etapa_Producao {
+        double consumo_eletre_estim    
+    }
+}
+
+package "Calculator" {
+    /'
+    Ver quais vão ser os argumentos de cada
+    calculo
+
+    Ver qual será melhor double ou float
+    '/
+    interface PCF_Tot {
+       + double tot_emissoes_CO2e() 
+       + double emissoes_med_ponderada()
+       + double tot_perdas()
+       + double PCF_total()
+       + double PCF_tot_ajustado()
+    }
+
+    /'
+    Aqui vai ser guardado todos os 
+    resultados das contas para obter o PCF
+    e os seus dados
+    '/
+    class PCF{
+
+    }
+}
+
+package "Relatorios" {
+    interface Relatorios {
+        + void relatorio_emissoes()
+        + void relatorio_perdas()
+        + void relatorio_componentes()
+    }
+
+    class Relatorio implements Relatorios {
+
+    }
+}
+
+package "Duvidas" {
+    class Flow {
+        
+    }
+
+}
+/'
+Fim dos packages
+'/
+
+/'
+Inicio das ligações
+'/
+/'Input Ligacoes'/
+
+
+
+
+Processo_unitario "1..*" -- "1..1" Processo_Agregado
+Etapa_Producao "1..*" -- "1..1" Processo_Agregado
+
+/'
+Fim das ligações
+'/
+@enduml
