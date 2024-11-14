@@ -1,0 +1,57 @@
+@startuml aquitetura
+
+interface "primary data" as prim_data
+interface "secunday data" as sec_data
+interface "data" as data
+interface "material" as material
+interface "Mix energetico" as energia
+interface "fluxo de entrada" as input
+interface "fluxo de saida" as output_prodution
+interface "PCF total" as pcf_tot
+interface "PCF Data" as PCF_Data
+interface "relatorio emissoes" as rel_emissoes 
+interface "relatorio perdas" as rel_perdas 
+interface "relatorio componentes" as rel_comp 
+
+[Company] as company
+company - prim_data
+
+[Missing primary data] as miss_prim
+miss_prim - sec_data
+
+[Data Ingestion] as data_ingestion
+data_ingestion - data
+
+data_ingestion --( prim_data
+data_ingestion --( sec_data
+
+[Data Processing] as data_processing
+data_processing - material
+data_processing -- energia
+data_processing --( data
+
+[Input] as input_comp
+input_comp --( energia
+input_comp --( material
+input_comp - input
+
+[Processo] as processo
+processo - output_prodution
+processo --( input
+
+[Calculator] as calculator
+calculator --( output_prodution
+calculator -( input
+calculator -- pcf_tot
+
+[PCF] as PCF
+PCF - PCF_Data
+PCF --( pcf_tot
+
+[Relatorios] as relatorio
+relatorio --( PCF_Data
+relatorio - rel_emissoes
+relatorio -- rel_perdas
+relatorio -- rel_comp
+
+@enduml
