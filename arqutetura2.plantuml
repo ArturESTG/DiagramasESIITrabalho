@@ -1,0 +1,50 @@
+@startuml aquitetura
+
+interface "select data" as selectData
+interface "import data" as imp_data
+interface "process data" as process_data
+interface "gestão input" as gest_input
+interface "gestão output" as gest_output
+interface "gestão processos" as gest_process
+interface "PCF total" as pcf_tot
+interface "PCF Data" as PCF_Data
+interface "relatorios" as relatorios 
+
+[Data] as data_comp
+data_comp - selectData
+
+[Data Ingestion] as data_ingestion
+data_ingestion --( selectData
+data_ingestion - imp_data
+
+[Data Processing] as data_processing
+data_processing - process_data
+data_processing --( imp_data
+
+[Input] as input_comp
+input_comp --( process_data
+input_comp -- gest_input
+
+[Output] as output_comp
+output_comp -- gest_output
+
+[Processo] as processo
+processo -- gest_process
+processo --( gest_input
+processo --( gest_output
+
+[Calculator] as calculator
+calculator --( gest_process
+calculator --( gest_input
+calculator --( gest_output
+calculator - pcf_tot
+
+[PCF] as PCF
+PCF - PCF_Data
+PCF --( pcf_tot
+
+[Relatorios] as relatorio_comp
+relatorio_comp --( PCF_Data
+relatorio_comp - relatorios
+
+@enduml
