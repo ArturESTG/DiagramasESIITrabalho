@@ -9,6 +9,7 @@ interface "gestão processos" as gest_process
 interface "gestão etapas" as gest_etapas
 interface "PCF total" as pcf_tot
 interface "relatorios" as relatorios 
+interface "Gestao Flow" as gest_flow 
 
 [Data] as data_comp
 data_comp - selectData
@@ -22,16 +23,24 @@ data_processing - process_data
 data_processing --( imp_data
 
 [Input] as input_comp
-input_comp --( process_data
-input_comp -- gest_input
+input_comp - gest_input
 
+/'
+Ver se os csv também tem outputs
+'/
 [Output] as output_comp
-output_comp -- gest_output
+output_comp - gest_output
+/'Meter para retornar'/
+[Flow] as Flow 
+Flow --( gest_input
+Flow --( gest_output
+Flow --( process_data
+Flow - gest_flow
 
 [Processo] as processo
 processo -- gest_process
-processo --( gest_input
-processo --( gest_output
+processo --( gest_flow
+
 
 [Etapa produção] as etapa
 gest_etapas -- etapa

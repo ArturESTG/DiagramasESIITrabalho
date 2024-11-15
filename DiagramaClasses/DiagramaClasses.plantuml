@@ -9,6 +9,7 @@ pelo motivo que um processo pode ter varios ou um input/output
 /'
 Inicio packages
 '/
+
 package "Data" {
     interface Selecet_Data {
 
@@ -18,14 +19,26 @@ package "Data" {
 
 package "Data Ingestion" {
     interface Import_Data {
-        + void import()
+        + String import_primary(String patch)
+        + String import_secundary(String patch)
+    }
+
+    class Import_Data {
     }
 }
 
 package "Data Processing" {
     interface Data_Processing {
-        + void process_data()
+        + void Process_data()
     }
+
+    class Process_data implements Data_Processing{
+    }
+
+    /'
+    Neste caso está assim para o improviso
+    '/
+    Process_data "0..1" -- "0..*" Import_Data
 }
 
 package "Inputs" {
@@ -35,22 +48,18 @@ package "Inputs" {
         + void alterarEtapa(Input target, Input etapa)
         + void consultarInput(Input target)
         + void listar()
-        + String toString() 
+        + String toString()
     }
 
     class Gestao_Inputs implements Gestao_Input {
-        int count 
+        int count
     }
 
-    abstract class Input {
-        int id_input
-    }
-
-    class Material extends Input {
+    abstract class Material {
         int id_material
     }
 
-    abstract class Fonte_Energia extends Input {
+    abstract class Fonte_Energia {
         int id_fonte
         String fonte_energ
         float proporcao
@@ -70,12 +79,18 @@ package "Inputs" {
     Este classe junta um input e um ouptut numa classe
     apenas, porque existe coisas que são um input/output ao mesmo tempo
     '/
-    class Input_Output {
-        int id_input
-        int id_ouput
+    class Material_Primario extends Material {
+
     }
 
-    Input "0..*" -- "1..1" Gestao_Inputs
+    /'
+    para materiais compostos(preFabricados), que ja possuem um valor de emissões
+    associado a sua produção, que tambem deverá se somar ao PCF
+    '/
+    class Material_Composto extends Material {
+    }
+
+
 }
 
 package "Outputs" {
@@ -85,28 +100,61 @@ package "Outputs" {
         + void alterarOutput(Output target, Output output)
         + void consultarOutput(Output target)
         + void listar()
-        + String toString() 
+        + String toString()
     }
 
     class Gestao_Outputs implements Gestao_Output {
         int count
     }
 
-    abstract class Output {
-        int id_output
+/'Meter enum tipo emissao'/
+    class Emissoes {
+        double valor_emissao
+        String unidade
     }
 
-    class Emissoes extends Output {
-
-    }
-
-    class Produto extends Output {
-    
-    }
-
-    /'Output Ligacoes'/
-    Output "0..*" -- "1..1" Gestao_Outputs
 }
+
+package "Flows" {
+    Enum FlowType{
+        Input
+        Output
+        Input_output
+    }
+
+    interface Gestao_Flow {
+        + void addFlow(Flow flow)
+        + Flow removerFlow(Flow target)
+        + void alterarFlow(Flow target, Flow flow)
+        + void consultarFlow(Flow target)
+        + void listar()
+        + String toString()
+    }
+
+    abstract class Flow {
+        FlowType tipo
+    }
+
+    class Gestao_Flows implements Gestao_Flow {
+
+    }
+
+    Flow "0..*" -- "1..1" FlowType
+    Gestao_Flows "1..*" -- "1..1" Flow
+}
+
+Emissoes --|> Flow
+Material --|> Flow
+Fonte_Energia --|> Flow
+
+Flow "0..*" -- "1..1" Gestao_Outputs
+Flow "0..*" -- "1..1" Gestao_Inputs
+Flow "1..1" -- "0..*" Process_data
+
+Emissoes "1..*" -- "1..1" Material_Composto
+Emissoes "1..*" -- "1..1" Energia_Hipotetica
+
+
 
 package "Processo" {
     interface Gestao_Processos {
@@ -115,12 +163,17 @@ package "Processo" {
         + void alterarProcesso(Processo target, Processo etapa)
         + void consultarProcesso(Processo target)
         + void listar()
-        + String toString() 
+        + String toString()
     }
 
     /'
-    Fazer ligação 0..* com o Processo_unitario 
+    Fazer ligação 0..* com o Processo_unitario
     '/
+    Enum Processo_Type{
+        internal
+        external
+    }
+
     abstract class Processo {
         String name
         String descricao
@@ -138,7 +191,7 @@ package "Processo" {
     /'
     Aqui mete-se uma variavel
     para saber o valor necessario
-    do input ou essa variavel vai 
+    do input ou essa variavel vai
     estar no processo?
     '/
 
@@ -155,22 +208,9 @@ package "Processo" {
         + void calculate_emissao_ajustada()
     }
 
-    enum TypeFlow {
-        Emissions
-        Land_Use
-        Materials_Production
-        Resources
-        Wastes
-    }
-
-    class Flow {
-        int id
-        TypeFlow type
-    }
-
+    Processo_unitario "0..*" - "1..1" Processo_Type
     Processo_unitario "1..1" - "0..*" Perdas
-    Processo_unitario "0..1" - "1..*" Input
-    Processo_unitario "0..1" - "1..*" Output
+    Processo_unitario "1..1" - "0..*" Gestao_Flows
 }
 
 package "Etapa Produção" {
@@ -184,17 +224,10 @@ package "Etapa Produção" {
         + String toString()
     }
 
-    class Producao implements Gestao_Etapas{
+    class Gestao_Etapa implements Gestao_Etapas {
         int count
+        double consumo_eletre_estim
     }
-
-    class Etapa_Producao {
-        int id_etapa
-        double consumo_eletre_estim    
-    }
-
-    /'Etapa Produção Ligacoes'/
-    Etapa_Producao "1..1" -- "0..*" Producao
 }
 
 package "Calculator" {
@@ -205,11 +238,11 @@ package "Calculator" {
     Ver qual será melhor double ou float
     '/
     interface PCF_Tot {
-       + double tot_emissoes_CO2e() 
-       + double emissoes_med_ponderada()
-       + double tot_perdas()
-       + double PCF_total()
-       + double PCF_tot_ajustado()
+        + double tot_emissoes_CO2e()
+        + double emissoes_med_ponderada()
+        + double tot_perdas()
+        + double PCF_total()
+        + double PCF_tot_ajustado()
     }
 
     interface Relatorios {
@@ -219,12 +252,15 @@ package "Calculator" {
     }
 
     /'
-    Aqui vai ser guardado todos os 
+    Aqui vai ser guardado todos os
     resultados das contas para obter o PCF
     e os seus dados
     '/
     class PCF implements PCF_Tot, Relatorios {
-
+        double PCFProduto
+        double ECF
+        double LCF
+        double PCFAjustado
     }
 }
 
@@ -240,15 +276,12 @@ Inicio das ligações
 /'Input Ligacoes'/
 
 Processo_unitario "1..*" -- "1..1" Processo_Agregado
-Etapa_Producao "1..*" -- "1..1" Processo_Agregado
+Gestao_Etapa "1..*" -- "1..1" Processo_Agregado
 
 /'Ligações Processos'/
 /'Ligaçoes PCF'/
-PCF "1..1" -- "0..*" Producao
+PCF "1..1" -- "0..*" Gestao_Etapa
 
-/'Ligação Input com Output'/
-Input "1..*" - "0..*" Output
-(Input, Output) .. Input_Output
 
 /'
 Fim das ligações
